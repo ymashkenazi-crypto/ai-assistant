@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import google.generativeai as genai
 import os
 
-app = Flask(__name__)
-CORS(app, origins="*", methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type"])
+app = Flask(__name__, static_folder='static')
+CORS(app)
 
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
@@ -18,15 +18,16 @@ model = genai.GenerativeModel(
     system_instruction=SYSTEM_PROMPT
 )
 
+@app.route("/")
+def index():
+    return send_from_directory('static', 'index.html')
+
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"})
 
-@app.route("/chat", methods=["POST", "OPTIONS"])
+@app.route("/chat", methods=["POST"])
 def chat():
-    if request.method == "OPTIONS":
-        return jsonify({"status": "ok"}), 200
-        
     data = request.json
     messages = data.get("messages", [])
     
