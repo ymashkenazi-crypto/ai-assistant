@@ -24,17 +24,22 @@ def index():
 
 @app.route("/health", methods=["GET"])
 def health():
-    has_key = bool(api_key)
-    return jsonify({"status": "ok", "has_api_key": has_key})
+    return jsonify({"status": "ok", "has_api_key": bool(api_key)})
+
+@app.route("/test", methods=["GET"])
+def test():
+    try:
+        response = model.generate_content("אמור שלום בעברית במשפט אחד")
+        return jsonify({"response": response.text, "status": "success"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.json
     messages = data.get("messages", [])
-    
     if not messages:
         return jsonify({"error": "No messages provided"}), 400
-
     try:
         history = []
         for msg in messages[:-1]:
@@ -42,16 +47,10 @@ def chat():
                 "role": "user" if msg["role"] == "user" else "model",
                 "parts": [msg["content"]]
             })
-        
         chat_session = model.start_chat(history=history)
         last_message = messages[-1]["content"]
         response = chat_session.send_message(last_message)
-        
-        return jsonify({
-            "response": response.text,
-            "status": "success"
-        })
-    
+        return jsonify({"response": response.text, "status": "success"})
     except Exception as e:
         print(f"ERROR: {str(e)}", flush=True)
         return jsonify({"error": str(e)}), 500
