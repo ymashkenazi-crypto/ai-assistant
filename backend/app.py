@@ -4,7 +4,7 @@ import google.generativeai as genai
 import os
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="*", methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type"])
 
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
@@ -22,8 +22,11 @@ model = genai.GenerativeModel(
 def health():
     return jsonify({"status": "ok"})
 
-@app.route("/chat", methods=["POST"])
+@app.route("/chat", methods=["POST", "OPTIONS"])
 def chat():
+    if request.method == "OPTIONS":
+        return jsonify({"status": "ok"}), 200
+        
     data = request.json
     messages = data.get("messages", [])
     
