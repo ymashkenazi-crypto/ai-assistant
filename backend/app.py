@@ -15,8 +15,7 @@ SYSTEM_PROMPT = """אתה עוזר אישי חכם ומועיל בשם "עוזר
 
 model = genai.GenerativeModel(
     model_name="gemini-2.0-flash",
-    system_instruction=SYSTEM_PROMPT,
-    tools=["google_search"]
+    system_instruction=SYSTEM_PROMPT
 )
 
 @app.route("/health", methods=["GET"])
