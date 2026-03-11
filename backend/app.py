@@ -6,11 +6,11 @@ import os
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+api_key = os.environ.get("GEMINI_API_KEY")
+genai.configure(api_key=api_key)
 
 SYSTEM_PROMPT = """אתה עוזר אישי חכם ומועיל בשם "עוזר". 
 אתה עונה בעברית אלא אם המשתמש כותב בשפה אחרת.
-אתה יכול לעזור עם: כתיבה, ניתוח, תכנות, שאלות כלליות, חיפוש מידע, תרגום, ועוד.
 תמיד תהיה ידידותי, ברור ומדויק."""
 
 model = genai.GenerativeModel(
@@ -24,7 +24,8 @@ def index():
 
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok"})
+    has_key = bool(api_key)
+    return jsonify({"status": "ok", "has_api_key": has_key})
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -52,6 +53,7 @@ def chat():
         })
     
     except Exception as e:
+        print(f"ERROR: {str(e)}", flush=True)
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
