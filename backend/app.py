@@ -14,7 +14,7 @@ SYSTEM_PROMPT = """אתה עוזר אישי חכם ומועיל בשם "עוזר
 תמיד תהיה ידידותי, ברור ומדויק."""
 
 model = genai.GenerativeModel(
-    model_name="gemini-2.0-flash",
+    model_name="gemini-1.5-flash",
     system_instruction=SYSTEM_PROMPT
 )
 
